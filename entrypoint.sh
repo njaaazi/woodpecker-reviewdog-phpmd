@@ -39,6 +39,21 @@ if [ "${PLUGIN_FAIL_ON_ERROR}" = "true" ]; then
     FAIL_LEVEL_ARGS="-fail-level=any"
 fi
 
-php -d display_errors=stderr /usr/local/bin/phpmd.phar ${PLUGIN_TARGET_DIRECTORY}${excludeOption}${baselineFileOption} text ${PLUGIN_STANDARD} \
-    | sed -r "s/([0-9]+)\s+/\1:/gI" \
+set +e
+php -d display_errors=stderr -d memory_limit=-1 /usr/local/bin/phpmd.phar ${PLUGIN_TARGET_DIRECTORY}${excludeOption}${baselineFileOption} text ${PLUGIN_STANDARD} > /tmp/lint.out
+LINT_EXIT=$?
+set -e
+
+# phpmd: 0 = clean, 2 = violations, 3 = some files could not be parsed, anything else = crash or config error
+if [ "${LINT_EXIT}" -ne 0 ] && [ "${LINT_EXIT}" -ne 2 ] && [ "${LINT_EXIT}" -ne 3 ]; then
+    cat /tmp/lint.out
+    echo "phpmd failed with exit code ${LINT_EXIT}"
+    exit 1
+fi
+
+if [ "${LINT_EXIT}" -eq 3 ]; then
+    echo "phpmd could not parse some files. See the lines without a line number below."
+fi
+
+sed -r "s/([0-9]+)\s+/\1:/gI" /tmp/lint.out \
     | reviewdog -name="${PLUGIN_NAME}" -f=phpstan -reporter=${PLUGIN_REPORTER} ${FAIL_LEVEL_ARGS} -level=${PLUGIN_LEVEL} -diff='git diff' -tee
