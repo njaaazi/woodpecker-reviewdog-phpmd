@@ -13,6 +13,7 @@ PLUGIN_TARGET_DIRECTORY="${PLUGIN_TARGET_DIRECTORY:-src}"
 PLUGIN_EXCLUDE="${PLUGIN_EXCLUDE:-}"
 PLUGIN_NAME="${PLUGIN_NAME:-PHPMD}"
 PLUGIN_BASELINE_FILE="${PLUGIN_BASELINE_FILE:-}"
+PLUGIN_FAIL_ON_ERROR="${PLUGIN_FAIL_ON_ERROR:-false}"
 
 if [ -z "${PLUGIN_GITHUB_TOKEN}" ] && [ "${PLUGIN_REPORTER}" != "local" ]; then
     echo "github_token is required. Pass it via settings with from_secret."
@@ -33,6 +34,11 @@ if [ "${PLUGIN_BASELINE_FILE}" != "" ]; then
     baselineFileOption=" --baseline-file ${PLUGIN_BASELINE_FILE}"
 fi
 
+FAIL_LEVEL_ARGS=""
+if [ "${PLUGIN_FAIL_ON_ERROR}" = "true" ]; then
+    FAIL_LEVEL_ARGS="-fail-level=any"
+fi
+
 php -d display_errors=stderr /usr/local/bin/phpmd.phar ${PLUGIN_TARGET_DIRECTORY}${excludeOption}${baselineFileOption} text ${PLUGIN_STANDARD} \
     | sed -r "s/([0-9]+)\s+/\1:/gI" \
-    | reviewdog -name="${PLUGIN_NAME}" -f=phpstan -reporter=${PLUGIN_REPORTER} -level=${PLUGIN_LEVEL} -diff='git diff' -tee
+    | reviewdog -name="${PLUGIN_NAME}" -f=phpstan -reporter=${PLUGIN_REPORTER} ${FAIL_LEVEL_ARGS} -level=${PLUGIN_LEVEL} -diff='git diff' -tee

@@ -48,6 +48,7 @@ Store `github_token` using [Woodpecker secrets](https://woodpecker-ci.org/docs/u
 | `exclude` | _empty_ | Optional PHPMD `--exclude` pattern. |
 | `name` | `PHPMD` | Reviewdog check name. |
 | `baseline_file` | _empty_ | Optional PHPMD `--baseline-file` path. |
+| `fail_on_error` | `false` | If `true`, Reviewdog exits 1 when it finds any issue (`-fail-level=any`). |
 
 `github-pr-review` works with a PAT. `github-check` and `github-pr-check` use the GitHub Checks API and need an App installation token.
 

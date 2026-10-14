@@ -34,6 +34,7 @@ Based on [`mikebronner/action-reviewdog-phpmd`](https://github.com/mikebronner/a
 | `exclude` | _empty_ | Optional PHPMD `--exclude` pattern. |
 | `name` | `PHPMD` | Reviewdog check name. |
 | `baseline_file` | _empty_ | Optional PHPMD `--baseline-file` path. |
+| `fail_on_error` | `false` | If `true`, Reviewdog exits 1 when it finds any issue. |
 
 `github-pr-review` posts inline GitHub PR comments as the token's identity. Use this step on `pull_request` events. `github-check` and `github-pr-check` need an App installation token. Store `github_token` using [Woodpecker secrets](https://woodpecker-ci.org/docs/usage/secrets).
 
