@@ -33,6 +33,6 @@ if [ "${PLUGIN_BASELINE_FILE}" != "" ]; then
     baselineFileOption=" --baseline-file ${PLUGIN_BASELINE_FILE}"
 fi
 
-php /usr/local/bin/phpmd.phar ${PLUGIN_TARGET_DIRECTORY}${excludeOption}${baselineFileOption} text ${PLUGIN_STANDARD} \
+php -d display_errors=stderr /usr/local/bin/phpmd.phar ${PLUGIN_TARGET_DIRECTORY}${excludeOption}${baselineFileOption} text ${PLUGIN_STANDARD} \
     | sed -r "s/([0-9]+)\s+/\1:/gI" \
     | reviewdog -name="${PLUGIN_NAME}" -f=phpstan -reporter=${PLUGIN_REPORTER} -level=${PLUGIN_LEVEL} -diff='git diff' -tee
